@@ -16,7 +16,8 @@ const sendBtn =
 
 async function sendMessage() {
 
-  const text = userInput.value.trim();
+  const text =
+    userInput.value.trim();
 
   if (!text) return;
 
@@ -30,78 +31,82 @@ async function sendMessage() {
     "loading"
   );
 
-try {
-
-  const response = await fetch(
-    BACKEND_URL,
-    {
-      method: "POST",
-
-      headers: {
-        "Content-Type": "application/json"
-      },
-
-      body: JSON.stringify({
-        message: text
-      })
-    }
-  );
-
-  removeLoading();
-
-  const rawText =
-    await response.text();
-
-  console.log("RAW RESPONSE:", rawText);
-
-  let data = {};
-
   try {
-    data = JSON.parse(rawText);
-  } catch (e) {
 
-    addMessage(
-      "❌ Backend trả dữ liệu lỗi.",
-      "bot"
+    const response =
+      await fetch(
+        BACKEND_URL,
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+
+          body: JSON.stringify({
+            message: text
+          })
+        }
+      );
+
+    removeLoading();
+
+    const rawText =
+      await response.text();
+
+    console.log(
+      "RAW RESPONSE:",
+      rawText
     );
 
-    return;
-  }
+    let data = {};
 
-  if (!response.ok) {
+    try {
 
-    addMessage(
-      `❌ Lỗi server: ${response.status}`,
-      "bot"
+      data =
+        JSON.parse(rawText);
+
+    } catch (e) {
+
+      addMessage(
+        "❌ Backend trả dữ liệu lỗi.",
+        "bot"
+      );
+
+      return;
+    }
+
+    if (!response.ok) {
+
+      addMessage(
+        `❌ Lỗi server: ${response.status}`,
+        "bot"
+      );
+
+      return;
+    }
+
+    const reply =
+      data.reply ||
+      "⚠️ AI không phản hồi.";
+
+    addMessage(reply, "bot");
+
+  } catch (error) {
+
+    console.error(
+      "FETCH ERROR:",
+      error
     );
 
-    return;
+    removeLoading();
+
+    addMessage(
+      "❌ Không kết nối được backend.",
+      "bot"
+    );
   }
-
-  const reply =
-    data.reply ||
-    "⚠️ AI không phản hồi.";
-
-  addMessage(reply, "bot");
-
-} catch (error) {
-
- ```javascript id="rk95tw"
-} catch (error) {
-
-  console.error(
-    "FETCH ERROR:",
-    error
-  );
-
-  removeLoading();
-
-  addMessage(
-    "❌ Không kết nối được backend.",
-    "bot"
-  );
-}
-
 }
 
 /* =========================================
