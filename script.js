@@ -30,55 +30,78 @@ async function sendMessage() {
     "loading"
   );
 
-  try {
+try {
 
-    const response = await fetch(
-      BACKEND_URL,
-      {
-        method: "POST",
+  const response = await fetch(
+    BACKEND_URL,
+    {
+      method: "POST",
 
-        headers: {
-          "Content-Type": "application/json"
-        },
+      headers: {
+        "Content-Type": "application/json"
+      },
 
-        body: JSON.stringify({
-          message: text
-        })
-      }
-    );
-
-    removeLoading();
-
-    if (!response.ok) {
-
-      addMessage(
-        `❌ Lỗi server: ${response.status}`,
-        "bot"
-      );
-
-      return;
+      body: JSON.stringify({
+        message: text
+      })
     }
+  );
 
-    const data =
-      await response.json();
+  removeLoading();
 
-    const reply =
-      data.reply ||
-      "⚠️ AI không phản hồi.";
+  const rawText =
+    await response.text();
 
-    addMessage(reply, "bot");
+  console.log("RAW RESPONSE:", rawText);
 
-  } catch (error) {
+  let data = {};
 
-    console.error(error);
-
-    removeLoading();
+  try {
+    data = JSON.parse(rawText);
+  } catch (e) {
 
     addMessage(
-      "❌ Không kết nối được AI backend.",
+      "❌ Backend trả dữ liệu lỗi.",
       "bot"
     );
+
+    return;
   }
+
+  if (!response.ok) {
+
+    addMessage(
+      `❌ Lỗi server: ${response.status}`,
+      "bot"
+    );
+
+    return;
+  }
+
+  const reply =
+    data.reply ||
+    "⚠️ AI không phản hồi.";
+
+  addMessage(reply, "bot");
+
+} catch (error) {
+
+ ```javascript id="rk95tw"
+} catch (error) {
+
+  console.error(
+    "FETCH ERROR:",
+    error
+  );
+
+  removeLoading();
+
+  addMessage(
+    "❌ Không kết nối được backend.",
+    "bot"
+  );
+}
+
 }
 
 /* =========================================
