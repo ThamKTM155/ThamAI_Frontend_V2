@@ -169,4 +169,3 @@ userInput.addEventListener(
     }
   }
 );
-
